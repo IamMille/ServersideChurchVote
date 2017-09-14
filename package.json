@@ -1,0 +1,27 @@
+{
+  "name": "serversidechurchvote",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "byline": "^5.0.0",
+    "express": "^4.15.4",
+    "http": "0.0.0",
+    "mustache-express": "^1.2.5",
+    "socket.io": "^2.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IamMille/ServersideChurchVote.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IamMille/ServersideChurchVote/issues"
+  },
+  "homepage": "https://github.com/IamMille/ServersideChurchVote#readme"
+}

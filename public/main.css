@@ -1,0 +1,43 @@
+body {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+a:visited {
+    color: steelblue;
+}
+
+#main {
+    width: 600px;
+}
+
+.section {
+    margin-top: 10px;
+}
+.party .partyName {
+    font-size: 1.2em;
+    font-weight: bolder;
+    display: block;
+}
+.church {
+    display: inline-block;
+    margin-right: 10px;
+    color: darkgrey;
+}
+.churchCount {
+    color: black;
+}
+
+
+.flash {
+    -webkit-animation: green-fade 2s ease-in 1;
+    animation: green-fade 2s ease-in 1;
+}
+@-webkit-keyframes green-fade {
+    0% {background: green;}
+    100% {background: none;}
+}
+@keyframes green-fade {
+    0% {background: green;}
+    100% {background: none;}
+}

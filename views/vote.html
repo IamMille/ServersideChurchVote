@@ -1,0 +1,56 @@
+<html>
+{{> header}}
+
+<body>
+    <h1>
+        <a href="/vote" target="_parent">Church Voting Both</a>
+    </h1>
+
+    <div id="main">
+
+            <fieldset>
+            <legend>Voting booth</legend>
+            <p>
+                <label>Pick</label>
+                {{> dropdowns}}
+
+                <button>Vote</button>
+            </p>
+            </fieldset>
+
+
+    </div>
+
+    {{> cdnjs}}
+
+    <script>
+        let $ = (selector) =>
+        {
+            this.els = Array.from(document.querySelectorAll(selector));
+            if (!this.els) console.warn('$ no matches for: ' + selector);
+            else if (selector.indexOf('#') > -1) return this.els[0];
+            else return this.els;
+        };
+
+        let main = () => {
+            let socket = io();
+
+            document.querySelector('button').addEventListener('click', () =>
+            {
+                let payload = {};
+
+                payload.party  = $('#party').options[$('#party').selectedIndex].value;
+                payload.church = $('#church').options[$('#church').selectedIndex].value;
+
+                let question = `You've picked: ${payload.church} - ${payload.party}\n\nIs this your final vote? You can't undo this!`;
+                if (!confirm(question)) return;
+
+                socket.send(payload);   console.log("Vote sent!", payload);
+                $('#main').innerHTML = `<p>God thanks you for your vote! <a href="/vote">Go back</a></p>`;
+            });
+        };
+
+        document.addEventListener('DOMContentLoaded', main);
+    </script>
+</body>
+</html>

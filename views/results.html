@@ -1,0 +1,91 @@
+<html>
+{{> header}}
+
+<body>
+    <h1>
+        <a href="/results" target="_parent">Church Vote Results</a>
+    </h1>
+
+    <p>
+        Number of sockets from this IP: <span id="numClientsIp">0</span><br/>
+        Total number of connected sockets: <span id="numClients">0</span>
+    </p>
+
+    <div id="continer">
+    {{#votes}}
+
+        <div class="section">
+            <div class="party">
+                <div id="{{party}}" class="partyName">
+                    {{party}}
+                </div>
+
+                {{#churches}}
+                <div class="church">
+                    {{name}} <div id="{{party}}{{name}}" class="churchCount">{{votes}}</div>
+                </div>
+                {{/churches}}
+            </div>
+        </div>
+
+    {{/votes}}
+    </div>
+
+    {{> cdnjs}}
+
+    <script>
+        let $ = (selector) =>
+        {
+            this.els = Array.from(document.querySelectorAll(selector));
+            if (!this.els) console.warn('$ no matches for: ' + selector);
+            else if (selector.indexOf('#') > -1) return this.els[0];
+            else return this.els;
+        };
+
+        let main = () => {
+            let socket = io();
+
+            socket.on('voted', (payload) =>
+            {
+                const {church, count, party} = payload.vote;
+
+                let section;
+                let partySection = $('#'.concat(party)) ? $('#'.concat(party)).parentNode : undefined;
+
+                if (!partySection) {
+                    section = document.createElement('div');
+                    section.classList.add("section");
+                    section.innerHTML = `
+                        <div class="party">
+                            <div id="${party}" class="partyName">${party}</div>
+                        </div>`;
+                    $('#continer').appendChild(section);
+                }
+
+                let churchSection = $('#'.concat(party, church));
+                if (!churchSection) {
+                    churchSection = document.createElement('div');
+                    churchSection.classList.add('church');
+                    churchSection.innerHTML = `${church} <div id=${party+''+church} class="churchCount"></div>`;
+                    $('#'.concat(party)).parentNode.appendChild(churchSection);
+                }
+
+                let el = $('#'.concat(party, church));
+                el.innerText = (Number(el.innerText) || 0) + (Number(count) || 1);
+                el.parentNode.classList.add('flash'); $('#audio').cloneNode().play();
+                setTimeout(() => el.parentNode.classList.remove('flash'), 2000);
+            });
+
+            socket.on('clients', (payload) => {
+                $('#numClients').innerText = payload.count;
+                $('#numClientsIp').innerText = payload.countip;
+            });
+        };
+
+        document.addEventListener('DOMContentLoaded', main);
+    </script>
+
+    <p><small>Note: there is sound! ;-)</small></p>
+    <audio id="audio" src="HighBoom.mp3" preload="auto"></audio>
+</body>
+</html>

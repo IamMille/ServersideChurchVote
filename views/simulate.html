@@ -1,0 +1,68 @@
+<html>
+{{> header}}
+
+<body>
+    <h1>
+        <a href="/simulate" target="_parent">Church Simulate Votings</a>
+    </h1>
+
+    <p><strong>Note: simulation doesn't actually save and store the votes!</strong></p>
+
+    <div id="main">
+        <fieldset>
+            <legend>Simulate</legend>
+            <p>
+                <button id="start">Start</button>
+                <button id="Stop">Stop</button>
+            </p>
+        </fieldset>
+    </div>
+
+    {{> cdnjs}}
+
+    <script>
+        let $ = (selector) =>
+        {
+            this.els = Array.from(document.querySelectorAll(selector));
+            if (!this.els) console.warn('$ no matches for: ' + selector);
+            else if (selector.indexOf('#') > -1) return this.els[0];
+            else return this.els;
+        };
+
+        let main = () => {
+            let socket = io();
+
+            $('#stop').disabled = true;
+
+            $('#stop').addEventListener('click', () => {
+                $('#stop').disabled = true;
+                $('#start').disabled = false;
+                clearInterval(simulation);
+            });
+            $('#start').addEventListener('click', () =>
+            {
+                $('#start').disabled = true;
+                $('#stop').disabled = false;
+
+                let churches = ['Gårdstenskyrkan', 'Kortedalskyrkan', 'Masthuggskyrkan', 'Vasakyrkan' ];
+                let partyies = ['Arbetarepartiet', 'Borgerligapariet', 'Centerpartiet', 'Flowerpower',
+                                'Järnrörsparitet', 'Vänsterpartiet' ]; // 'Högerpartiet, 'Mittemellanpartiet'
+
+                let simulfunc = () =>
+                {
+                    let payload = {};
+                    payload.church = churches[Math.floor(Math.random() * churches.length)];
+                    payload.party  = partyies[Math.floor(Math.random() * partyies.length)];
+                    payload.count = 100;
+                    payload.hash = 'simulate';
+                    socket.send(payload);   console.log("Simul sent!", payload);
+                };
+                simulation = setInterval(simulfunc, 2020);
+
+            });
+        };
+
+        document.addEventListener('DOMContentLoaded', main);
+    </script>
+</body>
+</html>
