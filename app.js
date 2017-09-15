@@ -78,10 +78,10 @@ io.on('connection', (socket) =>
     {
         let line = `${payload.hash || 'unknown'} ${payload.church} ${payload.party} ${payload.count || 1}\n`;
 
-        if (payload.hash !== 'simulate')
-            fs.appendFile('votes.txt', line, (err) => { if (err) throw err });
-
-        cacheVote(line);
+        if (payload.hash !== 'simulate') {
+            fs.appendFile('votes.txt', line, (err) => {if (err) throw err});
+            cacheVote(line);
+        }
 
         io.emit('voted', {time: new Date(), vote: payload});
     });
