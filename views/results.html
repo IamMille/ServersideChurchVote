@@ -50,7 +50,7 @@
                 const {church, count, party} = payload.vote;
 
                 let section;
-                let partySection = $('#'.concat(party)) ? $('#'.concat(party)).parentNode : undefined;
+                let partySection = $('#'.concat(party));
 
                 if (!partySection) {
                     section = document.createElement('div');

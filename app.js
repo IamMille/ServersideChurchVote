@@ -1,13 +1,33 @@
+
 const port = 3000;
+const database = 'votes.txt';
+
+// ---------------------------------------------------------
 
 const fs = require('fs');
-const byline = require('byline');
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
 server.listen(port);
+
+// ---------------------------------------------------------
+
+let votes = {};
+
+const cacheVote = (line) => {
+    let [_, church, party, count] = line.split(" ");
+
+    if (line.length === 0) return;
+    if (!(party in votes)) votes[party] = {};
+    if (!(church in votes[party])) votes[party][church] = 0;
+    votes[party][church] += Number(count) || 1;
+};
+
+fs.readFileSync(database)
+    .toString().split('\n')
+    .forEach(line => cacheVote(line));
 
 // ---------------------------------------------------------
 
@@ -52,28 +72,17 @@ app.get('*', (req, res) => res.render('404.html'));
 
 // ---------------------------------------------------------
 
-let stream, votes = {};
-stream = fs.createReadStream('votes.txt');
-stream = byline.createStream(stream);
-stream.on('data', (line) =>
-{
-    let [fingerprint, church, party, count] = line.toString().split(" ");
-
-    if (!(party in votes)) votes[party] = {};
-    if (!(church in votes[party])) votes[party][church] = 0;
-    votes[party][church] += Number(count) || 1;
-
-}).on('end', () => {
-    console.log(">>> Database loaded from disk.");
-});
-
-// ---------------------------------------------------------
-
 io.on('connection', (socket) =>
 {
-    socket.on('message', (payload) => {
+    socket.on('message', (payload) =>
+    {
         let line = `${payload.hash || 'unknown'} ${payload.church} ${payload.party} ${payload.count || 1}\n`;
-        if (payload.hash !== 'simulate') fs.appendFile('votes.txt', line, (err) => { if (err) throw err });
+
+        if (payload.hash !== 'simulate')
+            fs.appendFile('votes.txt', line, (err) => { if (err) throw err });
+
+        cacheVote(line);
+
         io.emit('voted', {time: new Date(), vote: payload});
     });
 
